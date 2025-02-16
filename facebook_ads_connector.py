@@ -38,21 +38,24 @@ def get_campaign_data(start_date, end_date):
         for campaign in campaigns:
             actions_list = campaign.get('actions', [])
             
-            # Criar estrutura para armazenar os diferentes tipos de ações
-            action_types = {
-                'resultados_cliques_no_link': 0,
-                'resultados_conversas_mensagem': 0
-            }
+            # Criar estrutura para armazenar todas as ações possíveis com valor padrão 0
+            action_types = {action: 0 for action in [
+                "landing_page_view", "link_click", "post_engagement", "page_like", "event_response",
+                "app_install", "video_view", "purchase", "add_to_cart", "initiate_checkout",
+                "add_payment_info", "lead", "message", "donate", "schedule", "complete_registration",
+                "search", "view_content", "reaction", "comment", "share", "save", "call_to_action_button_click",
+                "offer_claim", "app_activation", "achievement_unlocked", "level_achieved", "start_trial",
+                "subscribe", "unsubscribe", "app_update", "app_share", "app_rating", "start_subscription",
+                "cancel_subscription", "customize_product", "onsite_conversion.messaging_conversation_started_7d"
+            ]}
             
             # Mapear as ações específicas para colunas nomeadas corretamente
             for action in actions_list:
                 action_type = action.get('action_type', '').lower()
                 action_value = int(action.get('value', 0))  # Garantir conversão para int
                 
-                if action_type == 'link_click':
-                    action_types['resultados_cliques_no_link'] = action_value
-                elif action_type == 'onsite_conversion.messaging_conversation_started_7d':
-                    action_types['resultados_conversas_mensagem'] = action_value
+                if action_type in action_types:
+                    action_types[action_type] = action_value
             
             # Construir objeto final de dados
             campaign_data = {
@@ -88,7 +91,6 @@ def facebook_ads_data():
 
     data = get_campaign_data(start_date, end_date)
     return jsonify(data)
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
