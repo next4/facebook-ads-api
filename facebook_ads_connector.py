@@ -32,34 +32,54 @@ def get_campaign_data(start_date, end_date):
         # Obtendo os insights da campanha
         campaigns = account.get_insights(params=params)
         
-        # Transformar os dados em um DataFrame
+        # Lista para armazenar os dados processados
         data = []
+        
         for campaign in campaigns:
+            actions_list = campaign.get('actions', [])
+            
+            # Criar estrutura para armazenar os diferentes tipos de ações
+            action_types = {
+                'resultados_cliques_no_link': 0,
+                'resultados_conversas_mensagem': 0
+            }
+            
+            # Mapear as ações específicas para colunas nomeadas corretamente
+            for action in actions_list:
+                action_type = action.get('action_type', '').lower()
+                action_value = int(action.get('value', 0))  # Garantir conversão para int
+                
+                if action_type == 'link_click':
+                    action_types['resultados_cliques_no_link'] = action_value
+                elif action_type == 'onsite_conversion.messaging_conversation_started_7d':
+                    action_types['resultados_conversas_mensagem'] = action_value
+            
+            # Construir objeto final de dados
             campaign_data = {
                 'campaign_name': campaign.get('campaign_name', 'N/A'),
-                'impressions': campaign.get('impressions', 0),
-                'clicks': campaign.get('clicks', 0),
-                'spend': campaign.get('spend', 0),
-                'cpc': campaign.get('cpc', 0),
-                'cpm': campaign.get('cpm', 0),
-                'ctr': campaign.get('ctr', 0),
-                'actions': campaign.get('actions', [])
+                'impressions': int(campaign.get('impressions', 0)),
+                'clicks': int(campaign.get('clicks', 0)),
+                'spend': float(campaign.get('spend', 0)),
+                'cpc': float(campaign.get('cpc', 0)),
+                'cpm': float(campaign.get('cpm', 0)),
+                'ctr': float(campaign.get('ctr', 0)),
+                **action_types  # Adiciona as ações processadas
             }
+            
             data.append(campaign_data)
         
-        return pd.DataFrame(data)
+        return data
     
     except FacebookRequestError as e:
-        return pd.DataFrame({'error': [str(e)]})
+        return {"error": str(e)}
 
 @app.route('/facebook_ads_data', methods=['GET'])
 def facebook_ads_data():
     start_date = request.args.get('start_date', (datetime.now().strftime('%Y-%m-%d')))
     end_date = request.args.get('end_date', (datetime.now().strftime('%Y-%m-%d')))
     
-    df = get_campaign_data(start_date, end_date)
-    return jsonify(df.to_dict(orient="records"))
+    data = get_campaign_data(start_date, end_date)
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
-
