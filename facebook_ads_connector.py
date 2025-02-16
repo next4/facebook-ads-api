@@ -39,7 +39,7 @@ def get_campaign_data(start_date, end_date):
             actions_list = campaign.get('actions', [])
             
             # Criar estrutura para armazenar todas as ações possíveis com valor padrão 0
-            action_types = {action: 0 for action in [
+            action_types = {f"results_{action}": 0 for action in [
                 "landing_page_view", "link_click", "post_engagement", "page_like", "event_response",
                 "app_install", "video_view", "purchase", "add_to_cart", "initiate_checkout",
                 "add_payment_info", "lead", "message", "donate", "schedule", "complete_registration",
@@ -54,8 +54,8 @@ def get_campaign_data(start_date, end_date):
                 action_type = action.get('action_type', '').lower()
                 action_value = int(action.get('value', 0))  # Garantir conversão para int
                 
-                if action_type in action_types:
-                    action_types[action_type] = action_value
+                if f"results_{action_type}" in action_types:
+                    action_types[f"results_{action_type}"] = action_value
             
             # Construir objeto final de dados
             campaign_data = {
