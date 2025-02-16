@@ -80,11 +80,9 @@ def facebook_ads_data():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 
-    # Se os parâmetros de data não forem passados, definir um valor padrão (últimos 7 dias)
+    # Se não houver parâmetros de data, retorna um erro informativo
     if not start_date or not end_date:
-        today = datetime.now()
-        start_date = (today - timedelta(days=7)).strftime('%Y-%m-%d')
-        end_date = today.strftime('%Y-%m-%d')
+        return jsonify({"error": "Os parâmetros 'start_date' e 'end_date' são obrigatórios."}), 400
 
     data = get_campaign_data(start_date, end_date)
     return jsonify(data)
