@@ -5,6 +5,8 @@ from facebook_business.api import FacebookAdsApi
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.exceptions import FacebookRequestError
 from datetime import datetime
+from datetime import datetime, timedelta
+
 
 # Configuração do Facebook Ads API
 ACCESS_TOKEN = 'EAAQdoNHPnUwBO66BALlKOqwnjFeZABis1fBivE38gfFuyxJPlacnN349TVdKYc4pbjxpgMqQOKnvZByhbmZClBS0bULHkmkjc8f5iVToANSaDo67xLNUav6xHjdOZB5VIsdnZAyrBv0KicdWz1iHaVjuC9jyGf0EXVUluvzpoc9ZBVF8d50rgpicB06Geg7pLh'
