@@ -81,8 +81,15 @@ def facebook_ads_data():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 
-    # Se os parâmetros de data não forem passados, definir um valor padrão (últimos 7 dias)
-    if not start_date or not end_date:
+    # Se os parâmetros de data forem passados, converter de DD-MM-YYYY para YYYY-MM-DD
+    if start_date and end_date:
+        try:
+            start_date = datetime.strptime(start_date, "%d-%m-%Y").strftime('%Y-%m-%d')
+            end_date = datetime.strptime(end_date, "%d-%m-%Y").strftime('%Y-%m-%d')
+        except ValueError:
+            return jsonify({"error": "Formato de data inválido. Use DD-MM-YYYY"}), 400
+    else:
+        # Se os parâmetros de data não forem passados, definir um valor padrão (últimos 7 dias)
         today = datetime.now()
         start_date = (today - timedelta(days=7)).strftime('%Y-%m-%d')
         end_date = today.strftime('%Y-%m-%d')
